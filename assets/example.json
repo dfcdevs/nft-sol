@@ -1,0 +1,10 @@
+{
+    "name": "Kaola NFT",
+    "symbol": "KAO",
+    "description": "Testing mint NFT",
+    "seller_fee_basis_points": 5,
+    "external_url": "",
+    "edition": "",
+    "background_color": "000000",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/4/49/Koala_climbing_tree.jpg"
+}
