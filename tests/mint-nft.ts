@@ -6,7 +6,7 @@ describe("nft-marketplace", async () => {
   
   const testNftTitle = "Kaola NFT";
   const testNftSymbol = "KAO";
-  const testNftUri = "https://raw.githubusercontent.com/nft-sol/master/assets/example.json";
+  const testNftUri = "https://raw.githubusercontent.com/menduong/nft-sol/master/assets/example.json";
 
   const provider = anchor.AnchorProvider.env()
   const wallet = provider.wallet as anchor.Wallet;
