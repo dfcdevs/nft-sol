@@ -19,7 +19,7 @@ declare_id!("A1ZNwz9VXtGuXiQr1DFtVbkvBPfB7caKznmNHwa2SFVB");
 
 
 #[program]
-pub mod mint_nft {
+pub mod marketplace_nft_sol {
     use super::*;
 
     pub fn mint(
