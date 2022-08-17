@@ -1,5 +1,5 @@
 import * as anchor from "@project-serum/anchor";
-import { MintNft } from "../target/types/mint_nft";
+import { MarketplaceNftSol } from "../target/types/marketplace_nft_sol";
 
 
 describe("nft-marketplace", async () => {
@@ -11,7 +11,7 @@ describe("nft-marketplace", async () => {
   const provider = anchor.AnchorProvider.env()
   const wallet = provider.wallet as anchor.Wallet;
   anchor.setProvider(provider);
-  const program = anchor.workspace.MintNft as anchor.Program<MintNft>;
+  const program = anchor.workspace.MarketplaceNftSol as anchor.Program<MarketplaceNftSol>;
 
   const TOKEN_METADATA_PROGRAM_ID = new anchor.web3.PublicKey(
     "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
