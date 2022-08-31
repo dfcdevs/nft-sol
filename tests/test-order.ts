@@ -20,7 +20,7 @@ describe("ordering-nft", async () => {
     var list_order_account: anchor.web3.Keypair;
     var pda;
     const mint: anchor.web3.PublicKey = new anchor.web3.PublicKey(
-        "49swiGRKuZnQvXTdhnGhQae5PYzmzaQKVhMxxJn3M6JF"
+        "5LfdoZJRnMhkkSA6FU3kjtHkDiddYkJm3nzqHytVy6n"
     );
 
     var deployer: anchor.web3.Keypair;
@@ -115,6 +115,26 @@ describe("ordering-nft", async () => {
 
     it("update price all order", async () => {
         updatePriceAllOrder(deployer, program, list_order_account.publicKey);
+    });
+
+    it("detail order", async () => {
+        let listOrder = await (await program.account.listOrder.fetch(list_order_account.publicKey)).data;
+        console.log("Total: ", listOrder.length);
+        for (var i = 0; i < listOrder.length; i++) {
+            let nft_id = listOrder[i];
+            let pda = await derivePda(nft_id, program);
+            let data = await program.account.orderDetail.fetch(pda);
+            console.log("pda: ", pda.toString());
+            console.log(`Token_id: ${data.tokenId}   price: ${data.price}  seller: ${data.seller}`);
+            await program.methods.getOrderDetail(
+                data.tokenId
+            )
+            .accounts({
+                wallet: list_order_account.publicKey,
+            })
+            .signers([list_order_account])
+            .rpc();
+        }
     });
 
     it("associate ", async () => {

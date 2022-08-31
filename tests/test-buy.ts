@@ -85,12 +85,11 @@ describe("buy-nft", async () => {
 
         // Transact with the "buy" function in our on-chain program
         const price = data.price;
-        await program.methods.buy(
-            new anchor.BN(price)
-        )
+        await program.methods.buy()
             .accounts({
                 seller: seller,
                 mint: mint,
+                orderAccount: pda,
                 listOrderAccount: list_order_account.publicKey,
                 ownerTokenAccount: ownerTokenAddress,
                 ownerAuthority: vault.publicKey,

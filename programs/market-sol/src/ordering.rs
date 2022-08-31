@@ -6,11 +6,13 @@ use {
         associated_token,
         token,
     },
+    crate::state::{
+        OrderDetail,
+        ListOrder
+    },
 };
-use crate::state::ListOrder;
-use crate::state::OrderDetail;
 
-use crate::error::ErrorCode;
+use crate::errors::ErrorCode;
 
 pub fn setup_platform(
     ctx: Context<MarketPlatform>,
@@ -41,15 +43,34 @@ pub fn clear_data(
 
 pub fn update_order_detail(
     ctx: Context<UpdateOrderDetail>,
+    token_id: Pubkey,
     new_price: u64,
 ) -> Result<()> {
     msg!("Call update order detail");
+    let (pda, _) = Pubkey::find_program_address(&[token_id.as_ref(), b"_"], ctx.program_id);
     let order_account = &mut ctx.accounts.order_account;
+
+    if order_account.key() != pda {
+        return Err(error!(ErrorCode::InvalidInput))
+    }
+
     if order_account.seller != ctx.accounts.wallet.key() {
         return Err(error!(ErrorCode::NotOwner));
     }
     order_account.price = new_price;
     msg!("Call update order detail successfully");
+    
+    Ok(())
+}
+
+pub fn get_order_detail(
+    ctx: Context<GetOrderDetail>,
+    token_id: Pubkey,
+) -> Result<()> {
+    msg!("Call get order detail");
+
+    let (pda, _) = Pubkey::find_program_address(&[token_id.as_ref(), b"_"], ctx.program_id);
+    msg!("publicKey account: {}", pda.to_string());
     
     Ok(())
 }
@@ -137,6 +158,12 @@ pub struct ClearData<'info> {
 }
 
 #[derive(Accounts)]
+pub struct GetOrderDetail<'info> {
+    #[account(mut)]
+    pub wallet: Signer<'info>,
+}
+
+#[derive(Accounts)]
 pub struct UpdateOrderDetail<'info> {
     #[account(mut)]
     pub order_account: Account<'info, OrderDetail>,
@@ -175,16 +202,3 @@ pub struct CreateOrder<'info> {
     pub token_program: Program<'info, token::Token>,
     pub associated_token_program: Program<'info, associated_token::AssociatedToken>,
 }
-
-// #[account]
-// pub struct OrderDetail {
-//     pub seller: Pubkey,
-//     pub token_id: Pubkey,
-//     pub price: u64,
-// }
-
-// #[account]
-// pub struct ListOrder {
-//     pub list_owner: Pubkey,
-//     pub data: Vec<Pubkey>,
-// }

@@ -4,7 +4,7 @@ pub mod mint;
 pub mod buy;
 pub mod ordering;
 pub mod state;
-pub mod error;
+pub mod errors;
 
 use mint::*;
 use buy::*;
@@ -34,11 +34,9 @@ pub mod market_sol {
 
     pub fn buy(
         ctx: Context<BuyNft>,
-        price_order: u64
     ) -> Result<()> {
         buy::buy(
             ctx,
-            price_order,
         )
     }
 
@@ -54,11 +52,23 @@ pub mod market_sol {
 
     pub fn update_order_detail(
         ctx: Context<UpdateOrderDetail>,
+        token_id: Pubkey,
         new_price: u64
     ) -> Result<()> {
         ordering::update_order_detail(
             ctx,
+            token_id,
             new_price,
+        )
+    }
+
+    pub fn get_order_detail(
+        ctx: Context<GetOrderDetail>,
+        token_id: Pubkey,
+    ) -> Result<()> {
+        ordering::get_order_detail(
+            ctx,
+            token_id,
         )
     }
 

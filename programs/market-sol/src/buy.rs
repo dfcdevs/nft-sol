@@ -7,16 +7,24 @@ use {
         associated_token,
         token,
     },
+    crate::state::{
+        OrderDetail,
+        ListOrder,
+    },
+    crate::errors::ErrorCode,
 };
-
-use crate::state::ListOrder;
 
 pub fn buy(
     ctx: Context<BuyNft>,
-    price_order: u64
 ) -> Result<()> {
+    msg!("Call buy NFT {}", ctx.accounts.mint.key().to_string());
+    let (pda, _) = Pubkey::find_program_address(&[ctx.accounts.mint.key().as_ref(), b"_"], ctx.program_id);
+    msg!("pda: {}", pda);
+    if pda != ctx.accounts.order_account.key() {
+        return Err(error!(ErrorCode::InvalidInput))
+    }
 
-    msg!("Call buy nft {}, with price {} lamport...", ctx.accounts.mint.key().to_string(), price_order);
+    msg!("Call buy nft {}, with price {} lamport...", ctx.accounts.mint.key().to_string(), ctx.accounts.order_account.price);
     msg!("Purchaser (sending lamports): {}", &ctx.accounts.buyer_authority.key());
     msg!("Seller (receiving lamports): {}", &ctx.accounts.seller.key());
     system_program::transfer(
@@ -27,7 +35,7 @@ pub fn buy(
                 to: ctx.accounts.seller.to_account_info(),
             }
         ),
-        price_order
+        ctx.accounts.order_account.price
     )?;
     
     msg!("Lamports transferred successfully.");
@@ -82,6 +90,8 @@ pub struct BuyNft<'info> {
     pub seller: AccountInfo<'info>,
     #[account(mut)]
     pub mint: Account<'info, token::Mint>,
+    #[account(mut)]
+    pub order_account: Account<'info, OrderDetail>,
     #[account(mut)]
     pub list_order_account: Account<'info, ListOrder>,
     #[account(mut)]

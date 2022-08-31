@@ -16,4 +16,3 @@ pub struct ListOrder {
     pub list_owner: Pubkey,
     pub data: Vec<Pubkey>,
 }
-

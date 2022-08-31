@@ -12,4 +12,6 @@ pub enum ErrorCode {
     AlreadyListing,
     #[msg("Sale price must greater zero")]
     PriceMustGreaterZero,
+    #[msg("Invalid input")]
+    InvalidInput,
 }
