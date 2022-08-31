@@ -92,20 +92,25 @@ pub fn create_order(
 
     msg!("Creating vault token account...");
     msg!("Vault Token Address: {}", &ctx.accounts.vault_token_account.key());
-    associated_token::create(
-        CpiContext::new(
-            ctx.accounts.associated_token_program.to_account_info(),
-            associated_token::Create {
-                payer: ctx.accounts.owner_authority.to_account_info(),
-                associated_token: ctx.accounts.vault_token_account.to_account_info(),
-                authority: ctx.accounts.vault_authority.to_account_info(),
-                mint: ctx.accounts.mint.to_account_info(),
-                system_program: ctx.accounts.system_program.to_account_info(),
-                token_program: ctx.accounts.token_program.to_account_info(),
-                rent: ctx.accounts.rent.to_account_info(),
-            },
-        ),
-    )?;
+    let key = associated_token::get_associated_token_address(&ctx.accounts.vault_token_account.key(), &ctx.accounts.mint.key());
+    if key.to_string().is_empty() {
+        msg!("Create ATA for Vault");
+        associated_token::create(
+            CpiContext::new(
+                ctx.accounts.associated_token_program.to_account_info(),
+                associated_token::Create {
+                    payer: ctx.accounts.owner_authority.to_account_info(),
+                    associated_token: ctx.accounts.vault_token_account.to_account_info(),
+                    authority: ctx.accounts.vault_authority.to_account_info(),
+                    mint: ctx.accounts.mint.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    token_program: ctx.accounts.token_program.to_account_info(),
+                    rent: ctx.accounts.rent.to_account_info(),
+                },
+            ),
+        )?;
+    }
+    msg!("Vault already exists ata with NFT");
 
     msg!("Transferring NFT...");
     msg!("Owner Token Address: {}", &ctx.accounts.owner_token_account.key());    
@@ -174,7 +179,7 @@ pub struct UpdateOrderDetail<'info> {
 #[derive(Accounts)]
 pub struct CreateOrder<'info> {
     #[account(
-        init,
+        init_if_needed,
         payer = owner_authority,
         space = 82,
         seeds = [

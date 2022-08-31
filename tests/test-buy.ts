@@ -49,6 +49,10 @@ describe("buy-nft", async () => {
         // showAllOrder()
         let listOrder = await (await program.account.listOrder.fetch(list_order_account.publicKey)).data;
         console.log("Total: ", listOrder.length);
+        if (listOrder.length == 0) {
+            console.log("Not exists any order");
+            return;
+        }
         let index = listOrder.length - 1;
         // get last order detail
         let nft_id = listOrder[index];
@@ -83,9 +87,8 @@ describe("buy-nft", async () => {
         console.log(`Owner's Token Address: ${ownerTokenAddress}`);
         console.log(`Buyer's Token Address: ${buyerTokenAddress}`);
 
-        // Transact with the "buy" function in our on-chain program
-        const price = data.price;
-        await program.methods.buy()
+        try {
+            await program.methods.buy()
             .accounts({
                 seller: seller,
                 mint: mint,
@@ -98,5 +101,8 @@ describe("buy-nft", async () => {
             })
             .signers([buyer, vault])
             .rpc();
+        } catch(e) {
+            console.log(e);
+        }
     });
 });

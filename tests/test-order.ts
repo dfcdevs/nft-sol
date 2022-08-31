@@ -20,7 +20,7 @@ describe("ordering-nft", async () => {
     var list_order_account: anchor.web3.Keypair;
     var pda;
     const mint: anchor.web3.PublicKey = new anchor.web3.PublicKey(
-        "5LfdoZJRnMhkkSA6FU3kjtHkDiddYkJm3nzqHytVy6n"
+        "HK9x6uhAwtdG8doKSAcgaa7XnM5uUgsXRKrrYh3f8vks"
     );
 
     var deployer: anchor.web3.Keypair;
@@ -92,21 +92,24 @@ describe("ordering-nft", async () => {
         pda = await derivePda(mint, program);
         // console.log(`Checking if account ${(pda)} exists for token_id: ${fake_mint}`);
         // Transact with the "sell" function in our on-chain program
-
-        await program.methods.createOrder(
-            new anchor.BN(saleAmount)
-        )
-            .accounts({
-                orderAccount: pda,
-                listOrderAccount: list_order_account.publicKey,
-                mint: mint,
-                ownerTokenAccount: ownerTokenAddress,
-                ownerAuthority: wallet.publicKey,
-                vaultTokenAccount: vaultTokenAddress,
-                vaultAuthority: list_order_account.publicKey,
-            })
-            .signers([vault])
-            .rpc();
+        try {
+            await program.methods.createOrder(
+                new anchor.BN(saleAmount)
+            )
+                .accounts({
+                    orderAccount: pda,
+                    listOrderAccount: list_order_account.publicKey,
+                    mint: mint,
+                    ownerTokenAccount: ownerTokenAddress,
+                    ownerAuthority: wallet.publicKey,
+                    vaultTokenAccount: vaultTokenAddress,
+                    vaultAuthority: list_order_account.publicKey,
+                })
+                .signers([vault])
+                .rpc();
+        } catch(e) {
+            console.log(e);
+        }
     });
 
     it("fetch all list order", async () => {
