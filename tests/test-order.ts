@@ -20,7 +20,7 @@ describe("ordering-nft", async () => {
     var list_order_account: anchor.web3.Keypair;
     var pda;
     const mint: anchor.web3.PublicKey = new anchor.web3.PublicKey(
-        "HK9x6uhAwtdG8doKSAcgaa7XnM5uUgsXRKrrYh3f8vks"
+        "HoHzhVV6bijD2xHtPJ7n938mz7QFBEqdGfEBNss9BHAk"
     );
 
     var deployer: anchor.web3.Keypair;

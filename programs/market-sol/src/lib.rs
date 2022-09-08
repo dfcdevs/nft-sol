@@ -4,11 +4,13 @@ pub mod mint;
 pub mod buy;
 pub mod ordering;
 pub mod state;
+pub mod transfer;
 pub mod errors;
 
 use mint::*;
 use buy::*;
 use ordering::*;
+use transfer::*;
 
 
 declare_id!("ECpXc6PWu8ktZmJm4Qqit1zdeuSpTsAxzf3FmK9ULa7f");
@@ -36,6 +38,14 @@ pub mod market_sol {
         ctx: Context<BuyNft>,
     ) -> Result<()> {
         buy::buy(
+            ctx,
+        )
+    }
+    
+    pub fn transfer(
+        ctx: Context<TransferNFT>,
+    ) -> Result<()> {
+        transfer::transfer(
             ctx,
         )
     }

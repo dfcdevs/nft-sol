@@ -1,7 +1,7 @@
 import * as anchor from "@project-serum/anchor";
 import fs from 'mz/fs';
 
-
+export const DEPLOYER_KEY_PATH = "/Users/menduong/.config/solana/id.json";
 
 export async function createKeypairFromFile(
     filePath: string,
