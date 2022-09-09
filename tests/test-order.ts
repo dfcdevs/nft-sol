@@ -20,21 +20,15 @@ describe("ordering-nft", async () => {
     var list_order_account: anchor.web3.Keypair;
     var pda;
     const mint: anchor.web3.PublicKey = new anchor.web3.PublicKey(
-        "HoHzhVV6bijD2xHtPJ7n938mz7QFBEqdGfEBNss9BHAk"
+        "CsbL6UT5Wu6R4mmrF4oPiagkULUMXm9Q73ifScLkDkb9"
     );
 
-    var deployer: anchor.web3.Keypair;
+    var caller: anchor.web3.Keypair;
     var vault: anchor.web3.Keypair;
 
     before(async function () {
-        // list_order_account = await createKeypairFromFile(__dirname + "/keypairs/vault.local.json");
-        // order_account = await generateKeypair(provider);
-
-        // console.log(list_order_account.publicKey.toString());
-        // console.log(order_account.publicKey.toString());
-
         list_order_account = await createKeypairFromFile(__dirname + "/keypairs/vault.json");
-        deployer = await createKeypairFromFile("/Users/menduong/.config/solana/id.json");
+        caller = await createKeypairFromFile("/Users/menduong/.config/solana/id.json");
         vault = list_order_account;
         console.log(list_order_account.publicKey.toString());
         console.log("==========Done before initialize=============");
@@ -105,7 +99,7 @@ describe("ordering-nft", async () => {
                     vaultTokenAccount: vaultTokenAddress,
                     vaultAuthority: list_order_account.publicKey,
                 })
-                .signers([vault])
+                .signers([caller])
                 .rpc();
         } catch(e) {
             console.log(e);
@@ -117,7 +111,7 @@ describe("ordering-nft", async () => {
     });
 
     it("update price all order", async () => {
-        updatePriceAllOrder(deployer, program, list_order_account.publicKey);
+        updatePriceAllOrder(caller, program, list_order_account.publicKey);
     });
 
     it("detail order", async () => {

@@ -1,18 +1,19 @@
 use {
     anchor_lang::{
         prelude::*,
+        solana_program::program_pack::Pack,
     },
     anchor_spl::{
         associated_token,
         token,
+        token::spl_token,
     },
     crate::state::{
         OrderDetail,
         ListOrder
     },
+    crate::errors::ErrorCode,
 };
-
-use crate::errors::ErrorCode;
 
 pub fn setup_platform(
     ctx: Context<MarketPlatform>,
@@ -91,9 +92,16 @@ pub fn create_order(
     }
 
     msg!("Creating vault token account...");
-    msg!("Vault Token Address: {}", &ctx.accounts.vault_token_account.key());
-    let key = associated_token::get_associated_token_address(&ctx.accounts.vault_token_account.key(), &ctx.accounts.mint.key());
-    if key.to_string().is_empty() {
+    msg!("Vault Token Address: {}", &ctx.accounts.vault_token_account.key());    
+    if *ctx.accounts.vault_token_account.owner == spl_token::id() {
+        let ata_state = spl_token::state::Account::unpack(&ctx.accounts.vault_token_account.data.borrow())?;
+        // This can only happen if the owner transfered ownership to someone else but let's check anyway
+        if ata_state.owner != ctx.accounts.vault_authority.key() {
+            return Err(error!(ErrorCode::InvalidInput));
+        }
+        msg!("ATA already exists");
+    }
+    else {
         msg!("Create ATA for Vault");
         associated_token::create(
             CpiContext::new(
@@ -110,8 +118,6 @@ pub fn create_order(
             ),
         )?;
     }
-    msg!("Vault already exists ata with NFT");
-
     msg!("Transferring NFT...");
     msg!("Owner Token Address: {}", &ctx.accounts.owner_token_account.key());    
     msg!("Vault Token Address: {}", &ctx.accounts.vault_token_account.key());    
@@ -200,8 +206,9 @@ pub struct CreateOrder<'info> {
     /// CHECK: We're about to create this with Anchor
     #[account(mut)]
     pub vault_token_account: UncheckedAccount<'info>,
+    /// CHECK:
     #[account(mut)]
-    pub vault_authority: Signer<'info>,
+    pub vault_authority: AccountInfo<'info>,
     pub rent: Sysvar<'info, Rent>,
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, token::Token>,

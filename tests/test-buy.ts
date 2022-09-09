@@ -24,16 +24,10 @@ describe("buy-nft", async () => {
         "EQQ6gbeUctyb5WJndyUTeZDQpD53rS3FxhsndN9qUqpP"
     );
 
-    // var deployer: anchor.web3.Keypair;
     var vault: anchor.web3.Keypair;
     var buyer: anchor.web3.Keypair;
 
     before(async function () {
-        // list_order_account = await createKeypairFromFile(__dirname + "/keypairs/vault.local.json");
-        // order_account = await generateKeypair(provider);
-
-        // console.log(list_order_account.publicKey.toString());
-        // console.log(order_account.publicKey.toString());
 
         list_order_account = await createKeypairFromFile(__dirname + "/keypairs/vault.json");
         // deployer = await createKeypairFromFile("/Users/menduong/.config/solana/id.json");
@@ -69,9 +63,6 @@ describe("buy-nft", async () => {
         const seller: anchor.web3.PublicKey = new anchor.web3.PublicKey(
             data.seller
         )
-        // const seller: anchor.web3.PublicKey = new anchor.web3.PublicKey(
-        //     data.seller
-        // );
 
         // Derive the associated token account address for owner & buyer
 

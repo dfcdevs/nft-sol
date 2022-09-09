@@ -2,10 +2,12 @@ use {
     anchor_lang::{
         prelude::*,
         system_program,
+        solana_program::program_pack::Pack,
     },
     anchor_spl::{
         associated_token,
         token,
+        token::spl_token,
     },
     crate::state::{
         OrderDetail,
@@ -42,8 +44,16 @@ pub fn buy(
 
     msg!("Creating buyer token account...");
     msg!("Buyer Token Address: {}", &ctx.accounts.buyer_token_account.key());
-    let key = associated_token::get_associated_token_address(&ctx.accounts.buyer_token_account.key(), &ctx.accounts.mint.key());
-    if key.to_string().is_empty() {
+    if *ctx.accounts.buyer_token_account.owner == spl_token::id() {
+        let ata_state = spl_token::state::Account::unpack(&ctx.accounts.buyer_token_account.data.borrow())?;
+        // This can only happen if the owner transfered ownership to someone else but let's check anyway
+        if ata_state.owner != ctx.accounts.buyer_authority.key() {
+            return Err(error!(ErrorCode::InvalidInput));
+        }
+        msg!("ATA already exists");
+    }
+    else {
+
         msg!("Create ATA for Buyer");
         associated_token::create(
             CpiContext::new(
@@ -100,6 +110,7 @@ pub struct BuyNft<'info> {
     pub list_order_account: Account<'info, ListOrder>,
     #[account(mut)]
     pub owner_token_account: Account<'info, token::TokenAccount>,
+    /// CHECK:
     #[account(mut)]
     pub owner_authority: Signer<'info>,
     /// CHECK: We're about to create this with Anchor

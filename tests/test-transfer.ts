@@ -19,23 +19,23 @@ describe("transfer-nft", async () => {
 
     const program = anchor.workspace.MarketSol as anchor.Program<MarketSol>;
 
-    var deployer: anchor.web3.Keypair;
+    var owner_token: anchor.web3.Keypair;
     var receiver: anchor.web3.Keypair;
 
     before(async function () {
-        receiver = await createKeypairFromFile(__dirname + "/keypairs/receiver.json");
-        deployer = await createKeypairFromFile(DEPLOYER_KEY_PATH);
+        owner_token = await createKeypairFromFile(__dirname + "/keypairs/buyer.json");
+        receiver = await createKeypairFromFile(DEPLOYER_KEY_PATH);
         console.log("=============Done before initialize=============");
     });
 
     it("transfer", async () => {
         const mint: anchor.web3.PublicKey = new anchor.web3.PublicKey(
-            "euwDXm4f1NoZnTpqHK9HsBBY8iXv8HjnmgVsmMA3FEk"
+            "8CpUJu8unrNyQeQnJJuuMZtRkLce6xq6UPABXfnhCMSg"
         );
 
         const ownerTokenAddress = await anchor.utils.token.associatedAddress({
             mint: mint,
-            owner: deployer.publicKey
+            owner: owner_token.publicKey
         });
         const receiverTokenAddress = await anchor.utils.token.associatedAddress({
             mint: mint,
@@ -45,18 +45,17 @@ describe("transfer-nft", async () => {
         console.log(`Receiver's Token Address: ${receiverTokenAddress}`);
 
         try {
-            await program.methods.transfer(
-            )
+            await program.methods.transfer()
                 .accounts({
                     mint: mint,
                     ownerTokenAccount: ownerTokenAddress,
-                    ownerAuthority: wallet.publicKey,
-                    vaultTokenAccount: receiverTokenAddress,
-                    vaultAuthority: receiver.publicKey,
+                    ownerAuthority: owner_token.publicKey,
+                    receiverTokenAccount: receiverTokenAddress,
+                    receiverAuthority: receiver.publicKey,
                 })
-                .signers([receiver])
+                .signers([owner_token])
                 .rpc();
-        } catch(e) {
+        } catch (e) {
             console.log(e);
         }
     });
